@@ -22,11 +22,14 @@ const nextConfig: NextConfig = {
         { source: '/partner-1', destination: '/html/partner-1.html' },
         { source: '/schools', destination: '/html/schools.html' },
         { source: '/internship-application', destination: '/html/internship-application.html' },
-        { source: '/api/:path*', destination: 'https://www.lightscameralearn.org/api/:path*' },
+        // Intercept form submissions
+        { source: '/api/form/SaveFormSubmission', destination: '/api/intercept-form' },
         { source: '/universal/:path*', destination: 'https://www.lightscameralearn.org/universal/:path*' }
       ],
       afterFiles: [],
-      fallback: []
+      fallback: [
+        { source: '/api/:path*', destination: 'https://www.lightscameralearn.org/api/:path*' }
+      ]
     };
   },
 };

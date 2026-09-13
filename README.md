@@ -144,3 +144,41 @@ To test form submissions locally:
 2. The Database is the primary source of truth. Check your Neon DB dashboard to verify row insertion.
 3. Use a fake name (e.g., "Test User") and fake email. Do not use real personal information.
 4. If you fix the 403, you will see a new row appear in the Google Sheet. Until then, you can check the server console for the `console.error("Google Sheets webhook failed:", sheetRes.status)` log.
+## 3. Forms & Applications
+
+The repository contains several forms originally built in Squarespace.
+
+### Internship Application (`/internship-application`)
+This route uses the **Next.js submission infrastructure** while preserving the exact 100% pixel-perfect original Squarespace visual HTML.
+
+**Submission Flow:**
+1. User
+2. Existing native visual internship form (`public/html/internship-application.html`)
+3. `next.config.ts` intercepts `/api/form/SaveFormSubmission`
+4. Next.js Route Handler (`src/app/api/intercept-form/route.ts`) parses and maps the data.
+5. Server Action (`src/app/actions/submit-application.ts`)
+6. Neon Postgres Database
+7. Google Sheets Webhook
+8. Resend Email Dispatch
+
+**Double Submission Check:**
+The interception strictly prevents the data from ever reaching the production Squarespace backend. The Squarespace backend is completely bypassed for this route.
+
+**Google Sheets Integration:**
+The mapping matches columns A through Z. 
+**Known Issue:** The Google Apps Script Web App currently returns an HTTP 403 error during the `fetch` request in `submit-application.ts`. The database insertion and email fallbacks execute successfully, proving this is an isolated Google Apps Script authorization issue that needs investigation (Karim/Amal).
+
+### Other Forms
+All other forms (`/apply`, `/inscription`, `/contactus`, Newsletter) continue to function exactly as they did before, using the native Squarespace proxy flow. The interceptor explicitly forwards them to the production backend.
+
+## 4. Known Issues & Starting Points for Karim
+
+1. **Google Sheets 403 Error**:
+   When the internship application is submitted, `submit-application.ts` attempts to `POST` the mapped data to `process.env.GOOGLE_SHEETS_WEBHOOK_URL`. This returns a 403. Check the App Script deployment permissions.
+
+## 5. Available Scripts
+
+- `npm run dev`: Starts the local development server.
+- `npm run build`: Creates an optimized production build.
+- `npm run lint`: Runs ESLint to catch syntax and styling issues.
+- `npm run typecheck`: Validates TypeScript typing across the project.
