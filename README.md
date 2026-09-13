@@ -171,10 +171,20 @@ The mapping matches columns A through Z.
 ### Other Forms
 All other forms (`/apply`, `/inscription`, `/contactus`, Newsletter) continue to function exactly as they did before, using the native Squarespace proxy flow. The interceptor explicitly forwards them to the production backend.
 
-## 4. Known Issues & Starting Points for Karim
+## 4. Final Handoff & Known Issues
 
-1. **Google Sheets 403 Error**:
-   When the internship application is submitted, `submit-application.ts` attempts to `POST` the mapped data to `process.env.GOOGLE_SHEETS_WEBHOOK_URL`. This returns a 403. Check the App Script deployment permissions.
+### What You Need to Know (Karim)
+The frontend and routing are completely finished. The site exactly visually matches the legacy Squarespace site. You do **not** need to wire up the frontend, intercept the form, or rebuild any UI components.
+
+The internship application form natively submits via the standard Squarespace Javascript. However, `next.config.ts` intercepts this request, bypassing Squarespace's production backend entirely, and routes the payload to `src/app/api/intercept-form/route.ts`. 
+
+The API route extracts the fields and triggers `src/app/actions/submit-application.ts`.
+
+**Your primary task is debugging the Google Sheets authorization issue.**
+The backend correctly handles Neon DB insertion and Resend email dispatch, but the Google Sheets Webhook currently returns an **HTTP 403 Forbidden** error. Check the Google Apps Script deployment permissions.
+
+### Double Submission
+There is no risk of double submission. The interceptor explicitly blocks the internship form data from reaching `lightscameralearn.org`, while allowing other forms (e.g. `/contactus`) to pass through cleanly.
 
 ## 5. Available Scripts
 

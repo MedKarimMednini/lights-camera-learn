@@ -42,3 +42,9 @@ next-env.d.ts
 !.env.example
 logs/
 *.log
+.venv/
+original_site/
+.agents/
+tests/
+AGENTS.md
+CLAUDE.md
